@@ -9,11 +9,20 @@
       name="description"
       content="Web site created using create-react-app"
     />
+     <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
+
+      <link rel="icon" type="image/png" href="/favicon.png"></link>
+      <link async rel="stylesheet" href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.1/dist/semantic.min.css" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+
+      <!-- <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" /> -->
+
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -24,20 +33,33 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Magic Tutorial App</title>
+    <style type="text/css">
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 2rem;
+    }
+    </style>               
+
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <section class="hero">
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+          <div class="hero-body"
+              style="background-image:url('https://imgix.cosmicjs.com/d8ce4010-39c8-11eb-9ccb-e16da6a16ff7-EFFECTS.jpg?w=2000');background-size:cover;background-position:right;width:100%;height:24.5rem;position:relative;margin-bottom:2.625rem">
+              <div class="container">
+              </div>
+          </div>
+      </section>
+      <div class="root-wrapper">
+          <noscript>You need to enable JavaScript to run this app.</noscript>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+
+          <div id="root"></div>
+      </section>
+    
   </body>
 </html>
