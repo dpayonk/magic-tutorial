@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Layout from '../layout';
 
 class HomeIndex extends React.Component {
 
@@ -10,9 +10,13 @@ class HomeIndex extends React.Component {
             alert: "Welcome to the Magic Tutorial"
         }
     }
+    debugger;
 
     render() {
+        let location = "Home";
+
         return (
+            <Layout location={location} >
             <div className="container main-content">
                 <div className="columns has-text-centered">
                     <div className="column is-full">
@@ -24,6 +28,7 @@ class HomeIndex extends React.Component {
 
                 </div>
             </div>
+            </Layout>
         );
     }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import {UserRepository} from 'payonkjs';
+import {Logger} from 'payonkjs';
 import Loader from './Loader';
 import AuthService from '../services/AuthService'
 import AccountProfileService from "../services/AccountProfileService";
@@ -7,6 +7,8 @@ import AccountProfileService from "../services/AccountProfileService";
 class AuthForm extends Component {
 
   constructor(props) {
+    // props should have an eventHandler to call when 
+    // user has loggedIn or logged out
     super(props);
 
     this.state = {
@@ -52,15 +54,6 @@ class AuthForm extends Component {
     return true;
   }
 
-  async isAuthorized() {
-    if (this.state.fetchedAuthorization === false) {
-      await this.fetchAuthorizationProfile(); // authorization status set by getting profile
-      return this.state.isAuthorized;
-    } else {
-      return this.state.isAuthorized;       // fetch from cache
-    }
-  }
-
   async fetchAuthorizationProfile() {
     let isAuthorized = false;
     let authenticationProfile = await this.state.authService.getAuthenticationProfile();
@@ -83,8 +76,13 @@ class AuthForm extends Component {
     if (this.isValidEmail(this.state.emailInput)) {
       this.setState({ alert: "Starting auth process, setting email..." });
       let didToken = await this.state.authService.loginMagic(this.state.emailInput);
-      UserRepository.publishLogin(this.state.emailInput, didToken);
-      debugger;
+
+      Logger.alert("This is the page that started the auth process", didToken);
+      if(this.props.redirectCallback !== undefined){
+        this.props.eventHandler(this.state.emailInput, didToken);
+      } else {
+        Logger.alert("There is no event handler defined for auth form");
+      }
     }
   };
 
@@ -127,8 +125,6 @@ class AuthForm extends Component {
 
   renderLoginForm() {
     return (<div>
-      <p>Register with email</p>
-
       <form>
         <div className="field">
           <label className="label">Email</label>

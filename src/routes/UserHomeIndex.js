@@ -8,6 +8,7 @@ import AccountProfileService from '../services/AccountProfileService';
 import AuthService from '../services/AuthService';
 import AuthenticationProfile from '../models/AuthenticationProfile';
 import AccountProfile from '../models/AccountProfile';
+import Layout from '../layout';
 
 
 class UserHomeIndex extends React.Component {
@@ -32,15 +33,14 @@ class UserHomeIndex extends React.Component {
         }
 
         this.state = {
-            alert: "Hello, your name here",
+            alert: "Hello, stranger",
             accountProfile: accountProfile,
             authenticationProfile: authenticationProfile,
             status: 'initialized'
         }
         this.accountProfileService = AccountProfileService.getInstance();
 
-
-        this.handleStateChange = this.handleStateChange.bind(this);
+        this.handleUserChange = this.handleUserChange.bind(this);
         this.handleRefresh = this.handleRefresh.bind(this);
     }
 
@@ -54,12 +54,13 @@ class UserHomeIndex extends React.Component {
         }
     }
 
-    async handleStateChange(){
-        debugger;
+    async handleUserChange() {
         let authService = AuthService.getInstance();
-        if (authService.isLoggedIn() === false){
-            this.setState({authenticationProfile: null});
+        let isLoggedIn = await authService.isLoggedIn();
+        debugger;
+        if (isLoggedIn === false) {
             navigate('/login', { replace: true });
+           this.setState({ authenticationProfile: null, isLoggedIn: isLoggedIn });
         }
     }
 
@@ -105,27 +106,35 @@ class UserHomeIndex extends React.Component {
         const authenticationProfile = this.state.authenticationProfile;
 
         return (
-            <div className="container main-content">
-                <div className="columns is-centered has-text-centered">
-                    <div className="column is-four-fifths">
-                        <h1>My Profile</h1>
-                        <h2>{this.state.alert}</h2>
-                        <MagicProfileComponent
-                            emailAddress={accountProfile.emailAddress}
-                            publicAddress={authenticationProfile.publicAddress}
-                            didToken={authenticationProfile.didToken}
-                            onChange={this.handleStateChange}
-                        />
-                    </div>
-                    <div className="column is-one-fifths">
-                        {this.renderJWTWidget()}
-                        Here is where authorized apps are displayed
-</div>
+            <Layout>
+                <div className="container main-content">
+                    <div className="columns is-centered">
+                        <div className="column is-three-fifths">
+                            <h1>My Home</h1>
+                            <h2>{this.state.alert}</h2>
 
+                            <p>
+
+                                Here is where authorized apps are displayed
+                            </p>
+                        </div>
+                        <div className="column is-two-fifths">
+                            <div style={{margin:"0px 0px 10px 0px"}} className="is-pulled-right">
+                                {this.renderJWTWidget()}
+                            </div>
+                        <MagicProfileComponent
+                                emailAddress={accountProfile.emailAddress}
+                                publicAddress={authenticationProfile.publicAddress}
+                                didToken={authenticationProfile.didToken}
+                                onLogout={this.handleUserChange}
+                            />
+                        </div>
+
+                    </div>
+                    <div className="columns has-text-centered">
+                    </div>
                 </div>
-                <div className="columns has-text-centered">
-                </div>
-            </div>
+            </Layout>
         );
     }
 }

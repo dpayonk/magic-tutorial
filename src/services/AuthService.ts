@@ -40,14 +40,23 @@ class AuthService {
       showUI: true,
       redirectURI: this.getRedirectUri(),
     });
-    let newDidToken = await this.getMagicFactory().user.getIdToken({
-      lifespan: 999999999999999,
-    });
-    debugger;
-    // let did = await magic.user.getidToken({ lifespan: 999999999999999 });
+
+    // this didToken is only valid for 15 minutes
+    // need to call fetchAuthenticationProfile to get a longer lifespan
+    // token
     if (didToken !== null) {
       this.saveAuthentication(didToken);
     }
+  }
+
+  async handleMagicAuthenticationRedirect(): Promise<AuthenticationProfile | null> {
+    // Method called by redirect (from app.js)
+    let didToken = await this.getMagicFactory().auth.loginWithCredential();
+    if (didToken !== null) {
+      let authenticationProfile = await this.saveAuthentication(didToken);
+      return authenticationProfile;
+    }
+    return null;
   }
 
   // Move to AccountProfileService
@@ -68,16 +77,6 @@ class AuthService {
     }
   }
 
-  async onAuthenticationRedirectCallback(): Promise<AuthenticationProfile | null> {
-    // Method called by redirect (from app.js)
-    let didToken = await this.getMagicFactory().auth.loginWithCredential();
-    if (didToken !== null) {
-      let authenticationProfile = await this.saveAuthentication(didToken);
-      return authenticationProfile;
-    }
-    return null;
-  }
-
   getRedirectUri() {
     const appUrl = Configuration.AUTH_CALLBACK_ROUTE;
     return `${window.location.protocol}//${window.location.host}${appUrl}`;
@@ -91,7 +90,15 @@ class AuthService {
           email,
           publicAddress,
         } = await this.getMagicFactory().user.getMetadata();
+
+        // IMPORTANT: this will refresh the didToken
+        // which is used to authenticate a user
         const didToken = await this.getMagicFactory().user.getIdToken();
+        Logger.info('Did Token Update', didToken);
+        // this needs to be wrapped in a singleton or communicate among tabs
+        // let newDidToken = await this.getMagicFactory().user.getIdToken({
+        //   lifespan: 999999999999999,
+        // });
 
         if (email !== null && issuer !== null && publicAddress !== null) {
           let authProfile = new AuthenticationProfile(email, didToken);

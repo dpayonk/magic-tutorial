@@ -3,17 +3,21 @@ import { Logger, UserRepository } from 'payonkjs';
 import AuthService from '../services/AuthService'
 
 
-export default ({ emailAddress, publicAddress, didToken, onChange }) => {
-    let alert = (didToken !== undefined && didToken !== "") ? "Logged In" : "";
+export default ({ emailAddress, publicAddress, didToken, onLogout }) => {
+    let alert = (didToken !== undefined && didToken !== "") ? "" : "";
 
-    debugger;
     function handleLogout() {
-        debugger;
+        alert='Logging you out!';
         let service = AuthService.getInstance();
-        service.logout();
         UserRepository.clearAll();
-        Logger.alert("You have been logged out!");
-        onChange();
+
+        debugger;
+        service.logout();
+        if (onLogout !== undefined){
+            onLogout();
+            Logger.alert("You have been logged out!");
+        }
+
         debugger;
     };
 

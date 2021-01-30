@@ -46,7 +46,8 @@ AccountProfile.fromJson = function(jsonResponse: Object): AccountProfile | null 
             return new AccountProfile(jsonData); 
         }
     }catch(exc){
-        Logger.alert('AccountProfile.fromJson: Could not serialize response:', jsonResponse);
+        Logger.warn(`AccountProfile.fromJson: ${exc.toString()}`, exc);
+        Logger.alert(`AccountProfile.fromJson: Could not serialize response:`, jsonResponse);
     }
     
     return null;

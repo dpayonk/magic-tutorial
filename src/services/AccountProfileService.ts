@@ -1,4 +1,10 @@
-import { Logger, BaseService, ISerializableObject, IParsedResponse, UserRepository } from "payonkjs";
+import {
+  Logger,
+  BaseService,
+  ISerializableObject,
+  IParsedResponse,
+  UserRepository,
+} from "payonkjs";
 
 import AccountProfile from "../models/AccountProfile";
 import AuthenticationProfile from "../models/AuthenticationProfile";
@@ -25,6 +31,29 @@ class AccountProfileService extends BaseService {
     };
   }
 
+  async apiPost(remoteUrl: string, requestSchema: any, responseObject:any): Promise<IParsedResponse>{
+    debugger;
+    return await super.apiPost(remoteUrl, requestSchema, responseObject);
+  }
+
+  generateHeaders() : Record<string, string> {
+    let originalResult = super.generateHeaders();
+
+    // Logger.debug('Overwrite headers');
+    let jwtToken = UserRepository.getJWT();
+    
+    if (jwtToken !== null && jwtToken !== "") {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      };
+    }
+    Logger.info('JWT tokens are not currently present', jwtToken);
+    return {
+      'Content-Type': 'application/json'
+    }
+  }
+
   async createProfile(
     authenticationProfile: AuthenticationProfile
   ): Promise<ISerializableObject | null> {
@@ -36,6 +65,7 @@ class AccountProfileService extends BaseService {
       issuer: authenticationProfile.issuer,
     };
     try {
+      debugger;
       let { ok, model, data, errors } = await this.apiPost(
         this.endpoints().createProfileRouteUrl.url,
         createProfileRequestSchema,
@@ -58,8 +88,7 @@ class AccountProfileService extends BaseService {
   // could help with context (know who you are) vs. regular rest call
   async fetchMyProfile(): Promise<AccountProfile | null> {
     try {
-      debugger;
-      // this should amost always have a jwt toke
+      // this should almost always have a jwt token
       let { ok, model, errors } = await this.apiGet(
         this.endpoints().myProfileRouteUrl.url,
         { permission: "my_profile" },
@@ -94,10 +123,8 @@ class AccountProfileService extends BaseService {
       permissionName: permissionName,
     };
     if (this.hasJWT() === false) {
-      Logger.alert(
-        "Checking authorization as a public user.  Please make sure to create a session",
-        {}
-      );
+      Logger.alert("No token present.  A profile needs to be created.", null);
+      return false;
     }
 
     Logger.info(
@@ -112,14 +139,15 @@ class AccountProfileService extends BaseService {
         headers: this.generateHeaders(),
         body: JSON.stringify(variables),
       });
+
       let jsonResponse = await response.json();
       Logger.info(`AuthService.getAuthorizationProfile:`, jsonResponse);
       if (jsonResponse.data === undefined) {
         throw new Error("Invalid Schema Response.  No data element defined");
       }
-      // [server url](payonk/controllers/is_authorized_url)
-      let data = jsonResponse.data; // changed to be more graphql like
-      // jsonResponse = {data: {authenticated: bool, authorized: bool}, errors: string}
+
+      // responseSchema = {data: {authenticated: bool, authorized: bool}, errors: string}
+      let data = jsonResponse.data;
 
       if (jsonResponse.errors === "") {
         if (data.authorized !== undefined || data.authorized !== null) {
