@@ -1,8 +1,8 @@
 import React, { Component } from "react"
-import Loader from '../components/Loader';
+import {UserRepository} from 'payonkjs';
+import Loader from './Loader';
 import AuthService from '../services/AuthService'
 import AccountProfileService from "../services/AccountProfileService";
-import UserRepository from "../repository/UserRepository";
 
 class AuthForm extends Component {
 
@@ -20,7 +20,7 @@ class AuthForm extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleRegister = this.handleRegister.bind(this);
+    this.handleRegistration = this.handleRegistration.bind(this);
   }
 
   async componentDidMount() {
@@ -78,7 +78,7 @@ class AuthForm extends Component {
     this.setState({ emailInput: event.target.value });
   }
 
-  async handleRegister(e) {
+  async handleRegistration(e) {
     e.preventDefault();
     if (this.isValidEmail(this.state.emailInput)) {
       this.setState({ alert: "Starting auth process, setting email..." });
@@ -144,7 +144,7 @@ class AuthForm extends Component {
         <div className="field is-grouped">
           <div className="control">
             <div className="field">
-              <button onClick={this.handleRegister} className="button is-light is-pull-right" type="submit">
+              <button onClick={this.handleRegistration} className="button is-light is-pull-right" type="submit">
                 Register
           </button>
             </div>

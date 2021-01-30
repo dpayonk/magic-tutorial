@@ -1,27 +1,21 @@
-import { Magic } from 'magic-sdk';
-import Logger from '../base/Logger';
-import AuthenticationProfile from '../magic/AuthenticationProfile';
-import UserRepository from '../repository/UserRepository';
-import StateStore from '../base/StateStore';
-import Configuration from '../Configuration';
-
+import { Magic } from "magic-sdk";
+import { Logger, StateStore, UserRepository } from "payonkjs";
+import AuthenticationProfile from "../models/AuthenticationProfile";
+import Configuration from "../Configuration";
 
 class AuthService {
-    static SINGLETON: AuthService;
-    static getInstance() : AuthService {
-        if (this.SINGLETON !== undefined) {
-          return this.SINGLETON
-        } else {
-          this.SINGLETON = new AuthService()
-          return this.SINGLETON
-        }
-      }    
-  
-  constructor() {
-     
+  static SINGLETON: AuthService;
+  static getInstance(): AuthService {
+    if (this.SINGLETON !== undefined) {
+      return this.SINGLETON;
+    } else {
+      this.SINGLETON = new AuthService();
+      return this.SINGLETON;
+    }
   }
 
   getMagicFactory() {
+    // wrapped this in order to make server side NodeJS compilation work with Gatsby
     return new Magic(Configuration.MAGIC_PUBLISHABLE_KEY);
   }
 
@@ -35,42 +29,51 @@ class AuthService {
     let m = this.getMagicFactory();
     m.user.logout();
     // remove from localStorage as well
-    UserRepository.clearAuthentication();
+    UserRepository.clearAll();
   }
 
   async loginMagic(emailAddress: string) {
-    // Method to start authentication, 
+    // Method to start authentication,
     UserRepository.storeEmail(emailAddress);
     let didToken = await this.getMagicFactory().auth.loginWithMagicLink({
       email: emailAddress,
       showUI: true,
-      redirectURI: this.getRedirectUri()
+      redirectURI: this.getRedirectUri(),
     });
-    if(didToken !== null){
+    let newDidToken = await this.getMagicFactory().user.getIdToken({
+      lifespan: 999999999999999,
+    });
+    debugger;
+    // let did = await magic.user.getidToken({ lifespan: 999999999999999 });
+    if (didToken !== null) {
       this.saveAuthentication(didToken);
     }
   }
 
   // Move to AccountProfileService
-  async saveAuthentication(didToken: string): Promise<AuthenticationProfile | null> {
-    UserRepository.storeKey('didToken', didToken);
-    UserRepository.storeKey('updatedAt', new Date().toISOString());
-    let subscribers = StateStore.publishEvent('onLogin', {'didToken': didToken });
+  async saveAuthentication(
+    didToken: string
+  ): Promise<AuthenticationProfile | null> {
+    UserRepository.storeKey("didToken", didToken);
+    UserRepository.storeKey("updatedAt", new Date().toISOString());
+    let subscribers = StateStore.publishEvent("onLogin", {
+      didToken: didToken,
+    });
     Logger.info(`Subscribers notified:`, subscribers);
     let emailAddress = UserRepository.getEmailAddress();
-    if(emailAddress !== null){
+    if (emailAddress !== null) {
       return new AuthenticationProfile(emailAddress, didToken);
     } else {
       return null;
     }
   }
 
-  async onAuthenticationRedirectCallback(): Promise<AuthenticationProfile | null>  {
+  async onAuthenticationRedirectCallback(): Promise<AuthenticationProfile | null> {
     // Method called by redirect (from app.js)
     let didToken = await this.getMagicFactory().auth.loginWithCredential();
-    if(didToken !== null){
+    if (didToken !== null) {
       let authenticationProfile = await this.saveAuthentication(didToken);
-      return authenticationProfile;  
+      return authenticationProfile;
     }
     return null;
   }
@@ -83,21 +86,28 @@ class AuthService {
   async getAuthenticationProfile(): Promise<AuthenticationProfile | null> {
     if (await this.isLoggedIn()) {
       try {
-        const { issuer, email, publicAddress } = await this.getMagicFactory().user.getMetadata();
+        const {
+          issuer,
+          email,
+          publicAddress,
+        } = await this.getMagicFactory().user.getMetadata();
         const didToken = await this.getMagicFactory().user.getIdToken();
-        if (email !== null && issuer !== null && publicAddress !== null){
+
+        if (email !== null && issuer !== null && publicAddress !== null) {
           let authProfile = new AuthenticationProfile(email, didToken);
           authProfile.issuer = issuer;
-          authProfile.publicAddress = publicAddress;  
+          authProfile.publicAddress = publicAddress;
           return authProfile;
         }
       } catch (error) {
-        Logger.error(`Auth service had a problem getting magic metadata`, error);
+        Logger.error(
+          `Auth service had a problem getting magic metadata`,
+          error
+        );
       }
     }
     return null;
   }
 }
 
-
-export default AuthService
+export default AuthService;

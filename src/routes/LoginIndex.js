@@ -1,8 +1,8 @@
 import React from 'react'
 import Layout from '../layout'
 import Loader from '../components/Loader';
-import AuthForm from '../magic/AuthForm';
-import Logger from '../base/Logger';
+import AuthForm from '../components/AuthForm';
+import {Logger} from  'payonkjs';
 import AuthService from '../services/AuthService';
 import AccountProfileService from '../services/AccountProfileService';
 

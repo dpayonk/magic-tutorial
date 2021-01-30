@@ -1,9 +1,7 @@
-import Logger from "../base/Logger";
+import { Logger, BaseService, ISerializableObject, IParsedResponse, UserRepository } from "payonkjs";
+
 import AccountProfile from "../models/AccountProfile";
-import AuthenticationProfile from "../magic/AuthenticationProfile";
-import BaseService from "../base/BaseService";
-import UserRepository from "../repository/UserRepository";
-import { ISerializableObject, IParsedResponse } from "../base/BaseInterfaces";
+import AuthenticationProfile from "../models/AuthenticationProfile";
 import Configuration from "../Configuration";
 
 class AccountProfileService extends BaseService {
@@ -60,6 +58,8 @@ class AccountProfileService extends BaseService {
   // could help with context (know who you are) vs. regular rest call
   async fetchMyProfile(): Promise<AccountProfile | null> {
     try {
+      debugger;
+      // this should amost always have a jwt toke
       let { ok, model, errors } = await this.apiGet(
         this.endpoints().myProfileRouteUrl.url,
         { permission: "my_profile" },

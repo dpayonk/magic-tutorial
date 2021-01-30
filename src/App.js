@@ -1,14 +1,32 @@
 import React from "react"
-import { Router } from "@reach/router"
+import { navigate, Router } from "@reach/router"
 import Loader from "./components/Loader";
-import Logger from './base/Logger';
-import AuthForm from './magic/AuthForm';
+import { Logger } from 'payonkjs';
+import AuthForm from './components/AuthForm';
 import AuthService from "./services/AuthService";
 import AccountProfileService from "./services/AccountProfileService";
 import Layout from './layout';
 import LoginIndex from './routes/LoginIndex';
 import HomeIndex from './routes/HomeIndex';
 import UserHomeIndex from './routes/UserHomeIndex';
+
+class PrivateRoute extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    if (this.props.isLoggedIn !== true) {
+      navigate('/login');
+      return (<LoginIndex />);
+    }
+
+    return (
+      <UserHomeIndex />
+    )
+  }
+}
 
 class App extends React.Component {
 
@@ -52,28 +70,20 @@ class App extends React.Component {
   }
 
   render() {
+
     let location = "Home";
     if (this.state.status === 'loading') {
       return (<Loader title="Hang tight, starting up the app!" />)
     }
 
-    if (this.state.status === 'mounted' && this.state.isLoggedIn === false) {
-      return (
-        <Layout location={location}>
-          <Router basepath="/">
-            <LoginIndex path="/login" />
-            <HomeIndex default path="/" />
-          </Router>
-        </Layout>
-      );
-    }
-    // only returns if logged in
     return (
-        <div id="root">
-          <Router basepath="/">
-            <UserHomeIndex default path="/" />
-          </Router>
-        </div>
+      <Layout location={location}>
+        <Router basepath="/">
+          <LoginIndex path="/login" />
+          <PrivateRoute isLoggedIn={this.state.isLoggedIn} path="/home" />
+          <HomeIndex default path="/" />
+        </Router>
+      </Layout>
     );
   }
 }

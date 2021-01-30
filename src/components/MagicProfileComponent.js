@@ -1,29 +1,21 @@
 import React from 'react'
-import Logger from '../base/Logger';
+import { Logger, UserRepository } from 'payonkjs';
 import AuthService from '../services/AuthService'
-import UserRepository from '../repository/UserRepository'
 
 
-export default ({ emailAddress, publicAddress, didToken }) => {
-// export default (p) => {
-    // let didToken = "";
-    // let publicAddress = "";
-    // let emailAddress = "";
-
+export default ({ emailAddress, publicAddress, didToken, onChange }) => {
     let alert = (didToken !== undefined && didToken !== "") ? "Logged In" : "";
 
+    debugger;
     function handleLogout() {
         debugger;
         let service = AuthService.getInstance();
-        
         service.logout();
-        // clear all local
         UserRepository.clearAll();
         Logger.alert("You have been logged out!");
-        // console.log("redirect?");
+        onChange();
+        debugger;
     };
-
-
 
     return (
         <div>

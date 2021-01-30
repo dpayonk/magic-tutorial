@@ -1,8 +1,4 @@
-import {ISerializableObject} from '../base/BaseInterfaces';
-import SerializationMixin from '../base/BaseMixins';
-
-import Logger from '../base/Logger';
-
+import { ISerializableObject, SerializationMixin, Logger } from 'payonkjs';
 
 class AccountProfile extends SerializationMixin implements ISerializableObject {
     key: string = "";
@@ -18,14 +14,8 @@ class AccountProfile extends SerializationMixin implements ISerializableObject {
     constructor(props: Object = {}) {
         super();
         this.fillFromJSON(props);            
-        debugger;     
-        // TODO: Fix this  // AccountProfile.hydrate(props);
     }
     
-    greet() {
-        return "Hello, " + this.emailAddress;
-    }
-
     toJson(){
         return {
             'emailAddress': this.emailAddress,      
@@ -51,7 +41,6 @@ AccountProfile.validateJsonResponse = function(json_data): boolean{
 
 AccountProfile.fromJson = function(jsonResponse: Object): AccountProfile | null {
     try{
-        debugger;
         if(AccountProfile.validateJsonResponse(jsonResponse)){
             let jsonData = AccountProfile.convertToCamelCase(jsonResponse);
             return new AccountProfile(jsonData); 
