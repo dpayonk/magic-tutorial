@@ -9,6 +9,7 @@ import AuthService from '../services/AuthService';
 import AuthenticationProfile from '../models/AuthenticationProfile';
 import AccountProfile from '../models/AccountProfile';
 import Layout from '../layout';
+import FilerobotImageEditor from 'dpayonk-image-editor';
 
 
 class UserHomeIndex extends React.Component {
@@ -36,12 +37,24 @@ class UserHomeIndex extends React.Component {
             alert: "Hello, stranger",
             accountProfile: accountProfile,
             authenticationProfile: authenticationProfile,
-            status: 'initialized'
+            editImageUrl: 'https://nyc3.digitaloceanspaces.com/com.payonk.clique/20210114-181146--20210114-174832--stephen-walker-unsplash.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=KSB4OEBLVBM6HPQGPVDM%2F20210115%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20210115T001146Z&X-Amz-Expires=6000&X-Amz-SignedHeaders=host&X-Amz-Signature=2920e95f97ee6d1cbc0895f42ebb181f483c901ffe43943004e327955d20e750',
+            showImageEditor: false,
+            status: 'initialized',
+            isShow: false
         }
         this.accountProfileService = AccountProfileService.getInstance();
 
         this.handleUserChange = this.handleUserChange.bind(this);
         this.handleRefresh = this.handleRefresh.bind(this);
+        this.toggleCreator = this.toggleCreator.bind(this);
+    }
+
+    toggleCreator(){
+        if(this.state.isShow === true){
+            this.setState({isShow: false});
+        } else {
+            this.setState({isShow: true});
+        }
     }
 
     async componentDidMount() {
@@ -60,7 +73,7 @@ class UserHomeIndex extends React.Component {
         debugger;
         if (isLoggedIn === false) {
             navigate('/login', { replace: true });
-           this.setState({ authenticationProfile: null, isLoggedIn: isLoggedIn });
+            this.setState({ authenticationProfile: null, isLoggedIn: isLoggedIn });
         }
     }
 
@@ -112,17 +125,20 @@ class UserHomeIndex extends React.Component {
                         <div className="column is-three-fifths">
                             <h1>My Home</h1>
                             <h2>{this.state.alert}</h2>
-
-                            <p>
-
-                                Here is where authorized apps are displayed
-                            </p>
+                            <p>Here is where authorized apps are displayed</p>
+                            <button className="button is-primary" onClick={this.toggleCreator}>Edit a Photo</button>
+                            <FilerobotImageEditor
+                                show={this.state.isShow}
+                                onUpload={(img) => { console.log(img); }}
+                                src={this.state.editImageUrl}
+                                onClose={() => { this.setState({ isShow: false }); }}
+                            />
                         </div>
                         <div className="column is-two-fifths">
-                            <div style={{margin:"0px 0px 10px 0px"}} className="is-pulled-right">
+                            <div style={{ margin: "0px 0px 10px 0px" }} className="is-pulled-right">
                                 {this.renderJWTWidget()}
                             </div>
-                        <MagicProfileComponent
+                            <MagicProfileComponent
                                 emailAddress={accountProfile.emailAddress}
                                 publicAddress={authenticationProfile.publicAddress}
                                 didToken={authenticationProfile.didToken}

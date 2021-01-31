@@ -4,7 +4,6 @@ import Loader from "./components/Loader";
 import { Logger } from 'payonkjs';
 import AuthService from "./services/AuthService";
 import AccountProfileService from "./services/AccountProfileService";
-import Layout from './layout';
 import LoginIndex from './routes/LoginIndex';
 import HomeIndex from './routes/HomeIndex';
 import UserHomeIndex from './routes/UserHomeIndex';
@@ -13,10 +12,6 @@ import HealthcheckIndex from './routes/HealthcheckIndex';
 Logger.catchBreakpoint = true;
 
 class PrivateRoute extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     if (this.props.isLoggedIn !== true) {
@@ -31,10 +26,6 @@ class PrivateRoute extends React.Component {
 }
 
 class Redirector extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     if (this.props.isLoggedIn !== true) {
@@ -81,9 +72,7 @@ class App extends React.Component {
       Logger.error("app.js: An exception occurred loading the app.", error);
     }
 
-    this.setState({
-      status: 'mounted', isLoggedIn: isLoggedIn, status: 'mounted'
-    });
+    this.setState({ status: 'mounted', isLoggedIn: isLoggedIn });
   }
 
   onLogin() {
@@ -92,8 +81,6 @@ class App extends React.Component {
   }
 
   render() {
-
-    let location = "Home";
     if (this.state.status === 'loading') {
       return (<Loader title="Hang tight, starting up the app!" />)
     }

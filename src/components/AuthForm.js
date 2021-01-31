@@ -31,7 +31,7 @@ class AuthForm extends Component {
 
     if (this.state.authenticationProfile !== null) {
       // This is too complex combiniing a profile with magic link, need better model
-      if (this.state.isAuthorized == true) {
+      if (this.state.isAuthorized === true) {
         this.setState({ emailInput: this.state.authenticationProfile.emailAddress });        
       }
     } else {
